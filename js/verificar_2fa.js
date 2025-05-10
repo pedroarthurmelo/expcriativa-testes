@@ -3,7 +3,7 @@ document.getElementById('verificarForm').addEventListener('submit', function (e)
 
     const codigo = this.codigo.value;
 
-    fetch('../2fa/verificar_2fa.php', {
+    fetch('../php/verificar_2fa.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

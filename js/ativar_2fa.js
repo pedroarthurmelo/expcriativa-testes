@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('../2fa/ativar_2fa.php')
+    fetch('../php/ativar_2fa.php')
         .then(response => response.json())
         .then(data => {
             if (data.qrCodeUrl) {
