@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nova Senha</title>
+    <link rel="stylesheet" href="../css/nova_senha.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="cabeçalho">
+        <a href="bem_vindo.html" class="nav-logo-text">GameWorld</a>
+    </div>
+    <div class="container">
+        <form id="formNovaSenha">
+            <h1>Nova Senha</h1>
+            <input type="password" id="senha" placeholder="Nova senha" required><br>
+            <input type="password" id="confirmarSenha" placeholder="Confirmar nova senha" required><br>
+            <button type="button" onclick="atualizarSenha()">Atualizar Senha</button>
+        </form>
+    </div>
+
+    <script src="../js/nova_senha.js"></script>
+</body>
+</html>
