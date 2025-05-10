@@ -26,10 +26,10 @@ function login() {
             window.location.href = "dashboard.html";
         } else if (data.status === "activate_2fa") {
             // Redireciona para ativar o 2FA
-            window.location.href = "../2fa/ativar_2fa.php";
+            window.location.href = "../html/ativar_2fa.html";
         } else if (data.status === "2fa_required") {
             // Redireciona para verificar o código do 2FA
-            window.location.href = "../2fa/verificar_2fa.php";
+            window.location.href = "../html/verificar_2fa.html";
         } else if (data.status === "not_verified") {
             alert("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
         }

@@ -6,9 +6,12 @@ include '../php/conexao.php';
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
 use Sonata\GoogleAuthenticator\GoogleQrUrl;
 
+header('Content-Type: application/json');
+
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
-    header("Location: login.html");
+    http_response_code(401);
+    echo json_encode(['error' => 'Usuário não autenticado.']);
     exit;
 }
 
@@ -20,51 +23,29 @@ $result = $check->get_result();
 $userData = $result->fetch_assoc();
 
 if ($userData && $userData['2fa_confirmado']) {
-    echo "<p>O 2FA já está ativado para este usuário.</p>";
+    echo json_encode(['message' => 'O 2FA já está ativado.']);
     exit;
 }
 
-// Instancia o autenticador e gera nova chave
+// Instancia autenticador
 $g = new GoogleAuthenticator();
 $secret = $g->generateSecret();
 
-// Remove qualquer chave anterior da sessão e salva a nova
-unset($_SESSION['google_2fa_secret']);
+// Armazena chave na sessão
 $_SESSION['google_2fa_secret'] = $secret;
 
-// Atualiza a nova chave no banco e marca 2FA como não confirmado ainda
+// Atualiza no banco
 $stmt = $con->prepare("UPDATE usuarios SET google_2fa_secret = ?, 2fa_confirmado = 0 WHERE id = ?");
 $stmt->bind_param("si", $secret, $user_id);
 $stmt->execute();
 
-// Gera QR code
+// Gera QR Code
 $user = 'Pedro e Douglas' . $user_id;
 $issuer = 'GameWorld';
 $qrCodeUrl = GoogleQrUrl::generate($user, $secret, $issuer);
-?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Ativar 2FA</title>
-    <link rel="stylesheet" href="../css/ativar_2fa.css">
-</head>
-<body>
-    <div class="cabeçalho">
-    <a href="bem_vindo.html" class="nav-logo-text">GameWorld</a>
-    </div>
-
-    <div class="container">
-        <h1>Registre o QR Code no Google Authenticator</h1>
-        <img src="<?php echo htmlspecialchars($qrCodeUrl); ?>" class="qrcode"alt="QR Code" >
-        <p>Ou insira manualmente: <strong><?php echo $secret; ?></strong></p>
-        <p>Depois de escanear o código, clique abaixo:</p>
-        
-        <form action="verificar_2fa.php" method="get">
-            <button type="submit">Já escaneei</button>
-        </form>
-    </div>
-</body>
-</html>
+// Retorna dados em JSON
+echo json_encode([
+    'secret' => $secret,
+    'qrCodeUrl' => $qrCodeUrl
+]);
