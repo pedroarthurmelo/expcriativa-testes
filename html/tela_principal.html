@@ -92,24 +92,19 @@
             <img src="../imagens/monster_hunter_wilds.webp" class="row-poster row-posterLarge" alt="">
         </div>
     </div>
-    <script>
-        const nav = document.getElementById('nav');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY >= 100) {
-                nav.classList.add('nav-black')
-            }
-            else{
-                nav.classList.remove('nav-black')
-            }
-        })
-        document.addEventListener("DOMContentLoaded", function() {
-        const rows = document.querySelectorAll(".row-container");
+    <script type="module">
+    import { verificarSessaoOuRedirecionar } from "../js/verificar_sessao.js";
+    verificarSessaoOuRedirecionar();
 
-        
-
-        
-
+    // Scroll efeito no menu (mantido aqui)
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY >= 100) {
+            nav.classList.add('nav-black');
+        } else {
+            nav.classList.remove('nav-black');
+        }
     });
-    </script>
+</script>
 </body>
 </html>
