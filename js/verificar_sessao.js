@@ -4,7 +4,7 @@ function verificarSessao() {
         .then(data => {
             if (data.status === 'nao_logado') {
                 alert('Você precisa estar logado para acessar esta página.');
-                window.location.href = '../html/login.html';
+                window.location.href = '../html/bem_vindo.html';
             }
         })
         .catch(error => {

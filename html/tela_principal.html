@@ -11,7 +11,15 @@
     <!--parte de cima do header-->
     <div class="nav" id="nav">
         <a href="../html/tela_principal.html" class="nav-logo-text">GameWorld</a>
-        <a href="pagina_perfil.html" class="nav-user">Usuário</a>
+        <div class="dropdown">
+                <span class="nav-user" onclick="toggleDropdown()">Menu</span>
+                <div class="dropdown-content">
+                    <a href="pagina_perfil.html">Meu Perfil</a>
+                    <a href="logout.php">Logout</a>
+                </div>
+            </div>
+    </div>
+
         
     </div>
     <!--header-->
@@ -101,6 +109,19 @@
         } else {
             nav.classList.remove('nav-black');
         }
+    });
+
+    function toggleDropdown() {
+                const dropdown = document.querySelector('.dropdown-content');
+                dropdown.classList.toggle('active');
+            }
+
+            // Fecha o menu se clicar fora dele
+            window.addEventListener('click', function(event) {
+                const dropdown = document.querySelector('.dropdown-content');
+                if (!dropdown.contains(event.target) && !event.target.matches('.nav-user')) {
+                    dropdown.classList.remove('active');
+                }
     });
 </script>
 </body>
