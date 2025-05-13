@@ -12,7 +12,13 @@
     
 
     
-        <a href="../html/pagina_perfil.html" class="nav-user">Usuário</a>
+        <div class="dropdown">
+            <span class="nav-user" onclick="toggleDropdown()">Menu</span>
+            <div class="dropdown-content">
+                <a href="pagina_perfil.html">Meu Perfil</a>
+                <a href="logout.php">Logout</a>
+            </div>
+        </div>
     </div>
     <div class="caixa">
         <div class="caixa-interna">
@@ -58,5 +64,6 @@
         </div>
     </div>
     <script src="../js/verificar_sessao.js"></script>
+    <script src="../js/botao_menu.js"></script>
 </body>
 </html>

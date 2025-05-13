@@ -17,7 +17,7 @@
                     <a href="pagina_perfil.html">Meu Perfil</a>
                     <a href="logout.php">Logout</a>
                 </div>
-            </div>
+        </div>
     </div>
 
         
@@ -100,6 +100,7 @@
             <img src="../imagens/monster_hunter_wilds.webp" class="row-poster row-posterLarge" alt="">
         </div>
     </div>
+    <script src="../js/botao_menu.js"></script>
     <script>
     // Scroll efeito no menu (mantido aqui)
     const nav = document.getElementById('nav');
@@ -109,19 +110,6 @@
         } else {
             nav.classList.remove('nav-black');
         }
-    });
-
-    function toggleDropdown() {
-                const dropdown = document.querySelector('.dropdown-content');
-                dropdown.classList.toggle('active');
-            }
-
-            // Fecha o menu se clicar fora dele
-            window.addEventListener('click', function(event) {
-                const dropdown = document.querySelector('.dropdown-content');
-                if (!dropdown.contains(event.target) && !event.target.matches('.nav-user')) {
-                    dropdown.classList.remove('active');
-                }
     });
 </script>
 </body>

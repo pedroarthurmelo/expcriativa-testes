@@ -42,7 +42,41 @@
     z-index: 10;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
   }
-  
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #111;
+    min-width: 130px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+}
+
+  .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+  }
+
+  .dropdown-content a:hover {
+      background-color: #333;
+  }
+
+  /* Mostrar o dropdown quando a classe 'active' for aplicada */
+  .dropdown-content.active {
+      display: block;
+  }
+
+  /* Para o estilo no botão de menu, se necessário */
+  .nav-user {
+      cursor: pointer;
+      display: block;
+      color: white;
+      text-align: right;
+  }
+    
   .nav-logo-text {
     color: #fff;
     font-size: 28px;
