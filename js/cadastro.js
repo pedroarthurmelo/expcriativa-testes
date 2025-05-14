@@ -1,3 +1,13 @@
+function mostrarAlerta(mensagem) {
+    document.getElementById("mensagemAlerta").textContent = mensagem;
+    document.getElementById("alertaPersonalizado").style.display = "block";
+}
+
+function fecharAlerta() {
+    document.getElementById("alertaPersonalizado").style.display = "none";
+}
+
+
 function cadastrar() {
     let usuario = document.getElementById("username").value;
     let nome_completo = document.getElementById("nome_completo").value;
@@ -18,57 +28,52 @@ function cadastrar() {
     let regexSenha = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#!.])[0-9a-zA-Z$*&@#!.]{8,}$/;
 
     if (usuario == ""){
-        window.alert("Usuário não pode estar vazio!");
+        mostrarAlerta("Usuário não pode estar vazio!");
         return;
     }
 
     if (nome_completo == ""){
-        window.alert("Nome Completo não pode estar vazio!");
+        mostrarAlerta("Nome Completo não pode estar vazio!");
         return;
     }
 
-        // Validando email
-    if (regexEmail.test(email) == false) {
-        window.alert("Email precisa ser válido (EX: teste@dominio.com)");
+    // Validando email
+    if (!regexEmail.test(email)) {
+        mostrarAlerta("Email precisa ser válido (EX: teste@dominio.com)");
         return;
     }
 
     // Validando CPF
-    if (regexCPF.test(cpf) == false) {
-        window.alert("CPF apenas nesse formato -> xxx.xxx.xxx-xx");
+    if (!regexCPF.test(cpf)) {
+        mostrarAlerta("CPF apenas nesse formato -> xxx.xxx.xxx-xx");
         return;
     }
 
     // Validando telefone
-    if (regexTelefone.test(telefone) == false) {
-        window.alert("Telefone apenas nesses formato -> (xx) 9xxxx-xxxx, (xx) 9 xxxx-xxxx, (xx) xxxx-xxxx ou ");
+    if (!regexTelefone.test(telefone)) {
+        mostrarAlerta("Telefone apenas nesses formatos -> (xx) 9xxxx-xxxx, (xx) 9 xxxx-xxxx, (xx) xxxx-xxxx");
         return;
     }
 
     // Validando senha
-    if (regexSenha.test(senha) == false) {
-        window.alert("A senha precisa ter no mínimo 8 caracteres, entre eles, 1 número , 1 letra maiúscula e 1 símbolo.");
+    if (!regexSenha.test(senha)) {
+        mostrarAlerta("A senha precisa ter no mínimo 8 caracteres, entre eles, 1 número, 1 letra maiúscula e 1 símbolo.");
         return;
     }
 
     // Verificando se as senhas são iguais
     if (hashSenha !== hashConfirmarSenha) {
-        window.alert("As senhas não são iguais.");
+        mostrarAlerta("As senhas não são iguais.");
         return;
     }
 
-
-
-    //ENVIAR PARA O PHP VIA POST
+    // ENVIAR PARA O PHP VIA POST
     var form = document.getElementById('formulario');
-    
     var dados = new FormData(form);
-
 
     dados.set("senha", hashSenha);
     dados.set("confirmarSenha", hashConfirmarSenha);
-    
-    
+
     fetch("../php/envio_email.php", {
         method: "POST",
         body: dados
@@ -76,15 +81,15 @@ function cadastrar() {
     .then(response => response.json())
     .then(data => {
         if (data.status === "success") {
-            alert("E-mail de verificação enviado! Verifique sua caixa de entrada.");
-            window.location.href = "../html/login.html";
+            mostrarAlerta("E-mail de verificação enviado! Verifique sua caixa de entrada.");
+            setTimeout(() => {
+                window.location.href = "../html/login.html";
+            }, 5000); // espera 2s antes de redirecionar
         } else {
-            alert("Erro ao enviar e-mail: " + data.message);
+            mostrarAlerta("Erro ao enviar e-mail: " + data.message);
         }
     })
     .catch(error => {
-        alert("Erro na requisição: " + error);
+        mostrarAlerta("Erro na requisição: " + error);
     });
-    
-
 }
