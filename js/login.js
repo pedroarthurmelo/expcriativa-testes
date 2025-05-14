@@ -1,10 +1,19 @@
-function mostrarAlerta(mensagem) {
+let acaoAposFechar = null; // Variável global temporária
+
+function mostrarAlerta(mensagem, aoConfirmar = null) {
     document.getElementById("mensagemAlerta").textContent = mensagem;
     document.getElementById("alertaPersonalizado").style.display = "block";
+    acaoAposFechar = aoConfirmar;
 }
 
 function fecharAlerta() {
     document.getElementById("alertaPersonalizado").style.display = "none";
+
+    // Executa ação armazenada, se houver
+    if (acaoAposFechar && typeof acaoAposFechar === "function") {
+        acaoAposFechar();
+        acaoAposFechar = null; // Limpa após executar
+    }
 }
 
 function login() {
@@ -16,7 +25,7 @@ function login() {
         return;
     }
 
-    let hashedPassword = CryptoJS.SHA256(senha).toString(); // Gera hash antes do envio
+    let hashedPassword = CryptoJS.SHA256(senha).toString();
 
     let formData = new FormData();
     formData.append("email", email);
@@ -28,19 +37,22 @@ function login() {
     })
     .then(response => response.json())
     .then(data => {
-        mostrarAlerta(data.message);
-
         if (data.status === "success") {
-            // Login comum
-            window.location.href = "dashboard.html";
+            mostrarAlerta(data.message, () => {
+                window.location.href = "dashboard.html";
+            });
         } else if (data.status === "activate_2fa") {
-            // Redireciona para ativar o 2FA
-            window.location.href = "../html/ativar_2fa.html";
+            mostrarAlerta(data.message, () => {
+                window.location.href = "../html/ativar_2fa.html";
+            });
         } else if (data.status === "2fa_required") {
-            // Redireciona para verificar o código do 2FA
-            window.location.href = "../html/verificar_2fa.html";
+            mostrarAlerta(data.message, () => {
+                window.location.href = "../html/verificar_2fa.html";
+            });
         } else if (data.status === "not_verified") {
             mostrarAlerta("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
+        } else {
+            mostrarAlerta(data.message || "Erro no login. Tente novamente.");
         }
     })
     .catch(error => {
