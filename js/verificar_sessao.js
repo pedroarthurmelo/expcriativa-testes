@@ -5,6 +5,9 @@ function verificarSessao() {
             if (data.status === 'nao_logado') {
                 alert('Você precisa estar logado para acessar esta página.');
                 window.location.href = '../html/bem_vindo.html';
+            } else if (data.status === 'expirado') {
+                alert('Tempo de sessão expirado! Faça login novamente.');
+                window.location.href = '../html/bem_vindo.html';
             }
         })
         .catch(error => {
@@ -12,4 +15,8 @@ function verificarSessao() {
         });
 }
 
+// Verifica a sessão a cada 5 segundos
+setInterval(verificarSessao, 5000);
+
+// E também verifica imediatamente ao carregar
 verificarSessao();
