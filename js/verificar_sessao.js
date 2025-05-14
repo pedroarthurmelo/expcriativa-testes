@@ -2,12 +2,15 @@ function verificarSessao() {
     fetch('../php/verificar_sessao.php')
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'nao_logado') {
-                alert('Você precisa estar logado para acessar esta página.');
-                window.location.href = '../html/bem_vindo.html';
-            } else if (data.status === 'expirado') {
+            if (data.status === 'expirado') {
                 alert('Tempo de sessão expirado! Faça login novamente.');
-                window.location.href = '../html/bem_vindo.html';
+                window.location.href = '../html/login.html';
+            } else if (data.status === 'logado') {
+                // Usuário logado, tudo certo — sessão atualizada automaticamente
+                console.log('Usuário logado:', data.user_id);
+            } else {
+                // Usuário não logado — mas pode navegar livremente
+                console.log('Usuário navegando como visitante.');
             }
         })
         .catch(error => {
@@ -18,5 +21,5 @@ function verificarSessao() {
 // Verifica a sessão a cada 5 segundos
 setInterval(verificarSessao, 5000);
 
-// E também verifica imediatamente ao carregar
+// Verifica imediatamente ao carregar
 verificarSessao();
