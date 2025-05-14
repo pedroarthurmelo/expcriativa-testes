@@ -21,7 +21,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'expirado') {
-                    alert('Tempo de sessão expirado! Faça login novamente.');
+                    mostrarAlerta('Tempo de sessão expirado! Faça login novamente.');
                     window.location.href = '../html/login.html';
                 } else {
                     atualizarMenuUsuario(data.status);
@@ -32,6 +32,16 @@
             });
     }
 
-    verificarSessao();
+function mostrarAlerta(mensagem) {
+    document.getElementById("mensagemAlerta").textContent = mensagem;
+    document.getElementById("alertaPersonalizado").style.display = "block";
+}
+
+function fecharAlerta() {
+    document.getElementById("alertaPersonalizado").style.display = "none";
+}
+
+
+verificarSessao();
     
-    setInterval(verificarSessao, 5000);
+setInterval(verificarSessao, 5000);

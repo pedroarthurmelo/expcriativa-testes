@@ -1,9 +1,18 @@
+function mostrarAlerta(mensagem) {
+    document.getElementById("mensagemAlerta").textContent = mensagem;
+    document.getElementById("alertaPersonalizado").style.display = "block";
+}
+
+function fecharAlerta() {
+    document.getElementById("alertaPersonalizado").style.display = "none";
+}
+
 function login() {
     let email = document.getElementById("email").value;
     let senha = document.getElementById("senha").value;
 
     if (!email || !senha) {
-        alert("Por favor, preencha todos os campos.");
+        mostrarAlerta("Por favor, preencha todos os campos.");
         return;
     }
 
@@ -19,7 +28,7 @@ function login() {
     })
     .then(response => response.json())
     .then(data => {
-        alert(data.message);
+        mostrarAlerta(data.message);
 
         if (data.status === "success") {
             // Login comum
@@ -31,11 +40,11 @@ function login() {
             // Redireciona para verificar o código do 2FA
             window.location.href = "../html/verificar_2fa.html";
         } else if (data.status === "not_verified") {
-            alert("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
+            mostrarAlerta("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
         }
     })
     .catch(error => {
         console.error("Erro:", error);
-        alert("Erro no login. Tente novamente.");
+        mostrarAlerta("Erro no login. Tente novamente.");
     });
 }

@@ -1,0 +1,17 @@
+// Executa o logout assim que a página carregar
+        window.onload = () => {
+            fetch('../php/logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'deslogado') {
+                        alert("Você foi deslogado com sucesso!");
+                        window.location.href = "../html/login.html";
+                    } else {
+                        alert("Erro ao deslogar.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na requisição de logout:", error);
+                    alert("Erro de conexão.");
+                });
+        };
