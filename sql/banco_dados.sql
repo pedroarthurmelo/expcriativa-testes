@@ -14,6 +14,7 @@ CREATE TABLE usuarios (
     token_ativacao VARCHAR(100),
     google_2fa_secret VARCHAR(32),
     2fa_confirmado TINYINT(1) DEFAULT 0,
+    data_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pendente', 'ativo') DEFAULT 'pendente'
 
 );
@@ -25,3 +26,4 @@ CREATE TABLE codigos_recuperacao (
     expiracao DATETIME NOT NULL,
     FOREIGN KEY (email) REFERENCES usuarios(email) ON DELETE CASCADE
 );
+

@@ -46,6 +46,7 @@ setInterval(verificarSessao, 5000);
 // Verifica imediatamente ao carregar
 verificarSessao();
 
+
 document.addEventListener("keydown", function(e) {
     const alerta = document.getElementById("alertaPersonalizado");
     const aberto = alerta && alerta.style.display === "block";
