@@ -1,3 +1,21 @@
+let acaoAposFechar = null; // Variável global temporária
+
+function mostrarAlerta(mensagem, aoConfirmar = null) {
+    document.getElementById("mensagemAlerta").textContent = mensagem;
+    document.getElementById("alertaPersonalizado").style.display = "block";
+    acaoAposFechar = aoConfirmar;
+}
+
+function fecharAlerta() {
+    document.getElementById("alertaPersonalizado").style.display = "none";
+
+    // Executa ação armazenada, se houver
+    if (acaoAposFechar && typeof acaoAposFechar === "function") {
+        acaoAposFechar();
+        acaoAposFechar = null; // Limpa após executar
+    }
+}
+
 function getEmailFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get('email');
@@ -8,7 +26,7 @@ function validarCodigo() {
     const email = getEmailFromURL();
 
     if (!codigo) {
-        alert("Por favor, preencha o código.");
+        mostrarAlerta("Por favor, preencha o código.");
         return;
     }
 
@@ -23,14 +41,15 @@ function validarCodigo() {
     .then(res => res.json())
     .then(data => {
         if (data.status === "success") {
-            alert("Código verificado com sucesso!");
-            window.location.href = `../html/nova_senha.html?email=${encodeURIComponent(email)}`;
+            mostrarAlerta("Código verificado com sucesso!", () => {
+                window.location.href = `../html/nova_senha.html?email=${encodeURIComponent(email)}`;
+            });
         } else {
-            alert("Erro: " + data.message);
+            mostrarAlerta("Erro: " + data.message);
         }
     })
     .catch(err => {
         console.error("Erro:", err);
-        alert("Erro na solicitação. Tente novamente.");
+        mostrarAlerta("Erro na solicitação. Tente novamente.");
     });
 }
