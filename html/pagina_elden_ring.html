@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,28 +91,62 @@
                 <br><br>
                 <button class="botao-critica">Enviar</button>
             </div>
-            <h2>Comentários da Comunidade:</h2>
-            <div class="texto_critica">
-                <h3>Usuário1:</h3>
-                <p>Elden Ring é simplesmente INCRÍVEL! O combate é intenso e desafiador, cada confronto exige estratégia e adaptação, 
-                    é uma sensação de vitória garantida depois de cada chefão. O level design? Impecável! Os cenários são vastos, cheios de segredos e 
-                    detalhes que fazem a exploração valer cada minuto. 
-                    De dungeons sinuosas a paisagens de tirar o fôlego, tudo conectado de um jeito que só a From Software sabe fazer.</p><br><br>
-
-                <h3>Usuario2:</h3>
-                <p>jogão top, só progressão que é lenta, principalmente se for 100% na raça. Mas já eh de se esperar de um souls</p>
+            <h2>Críticas da Comunidade:</h2>
+            <div id="comentarios" class="texto_critica">
+                <!-- Os comentários carregados via JavaScript aparecerão aqui -->
             </div>
         </div>
     </div>  
 
     <script>
-        const likeBtn = document.getElementById('likeBtn');
-    
-        likeBtn.addEventListener('click', () => {
-            likeBtn.classList.toggle('liked');
+            const likeBtn = document.getElementById('likeBtn');
+        
+            likeBtn.addEventListener('click', () => {
+                likeBtn.classList.toggle('liked');
+            });
+        </script>
+        <script src="../js/verificar_sessao.js"></script>
+        <script src="../js/botao_menu.js"></script>
+        <script>
+    document.querySelector('.botao-critica').addEventListener('click', () => {
+        const critica = document.getElementById('criticaInput').value;
+
+        fetch('../php/enviar_critica.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ critica })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                document.getElementById('criticaInput').value = '';
+                carregarComentarios(); // Atualiza comentários automaticamente
+            } else {
+                alert(data.mensagem);
+            }
         });
-    </script>
-    <script src="../js/verificar_sessao.js"></script>
-    <script src="../js/botao_menu.js"></script>
+    });
+
+    function carregarComentarios() {
+        fetch('../php/obter_criticas.php?jogo=Elden Ring')
+        .then(response => response.json())
+        .then(data => {
+            const comentariosDiv = document.getElementById('comentarios');
+            comentariosDiv.innerHTML = '';
+            data.forEach(c => {
+                comentariosDiv.innerHTML += `
+                    <h3>${c.username}:</h3>
+                    <p>${c.texto}</p><br>
+                `;
+            });
+        });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', carregarComentarios);
+</script>
+
 </body>
 </html>

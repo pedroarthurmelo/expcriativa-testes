@@ -27,3 +27,13 @@ CREATE TABLE codigos_recuperacao (
     FOREIGN KEY (email) REFERENCES usuarios(email) ON DELETE CASCADE
 );
 
+CREATE TABLE criticas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    jogo VARCHAR(100) NOT NULL,
+    texto TEXT NOT NULL,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+
