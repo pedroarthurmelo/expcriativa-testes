@@ -10,11 +10,12 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 $dados = json_decode(file_get_contents("php://input"), true);
-$texto = trim($dados['critica']);
-$jogo = 'Elden Ring';
 
-if (empty($texto)) {
-    echo json_encode(['status' => 'erro', 'mensagem' => 'Crítica vazia']);
+$texto = trim($dados['critica']);
+$jogo = trim($dados['jogo']);
+
+if (empty($texto) || empty($jogo)) {
+    echo json_encode(['status' => 'erro', 'mensagem' => 'Crítica ou nome do jogo vazio']);
     exit;
 }
 

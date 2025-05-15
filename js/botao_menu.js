@@ -7,6 +7,7 @@ const likeBtn = document.getElementById('likeBtn');
     likeBtn.addEventListener('click', () => {
         likeBtn.classList.toggle('liked');
         });
+        
 
 // Fecha o menu se clicar fora dele
 window.addEventListener('click', function(event) {
@@ -15,3 +16,4 @@ window.addEventListener('click', function(event) {
         dropdown.classList.remove('active');
     }
 });
+
