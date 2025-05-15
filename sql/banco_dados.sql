@@ -36,4 +36,14 @@ CREATE TABLE criticas (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
+CREATE TABLE minha_lista (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  jogo VARCHAR(100) NOT NULL,
+  data_adicionado DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY idx_usuario_jogo (id_usuario, jogo),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+
 

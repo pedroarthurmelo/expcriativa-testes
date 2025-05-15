@@ -100,6 +100,26 @@
         <script src="../js/verificar_sessao.js"></script>
         <script src="../js/botao_menu.js"></script>
         <script src="../js/comentarios_jogos.js"></script>
+        <script>
+        document.getElementById('likeBtn').addEventListener('click', () => {
+            const jogo = document.body.getAttribute('data-jogo');
+
+            fetch('../php/salvar_like.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ jogo })
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                alert('Jogo adicionado à sua lista!');
+            } else {
+                alert('Erro: ' + (data.msg || 'Não foi possível adicionar o jogo'));
+            }
+            })
+            .catch(() => alert('Erro na comunicação com o servidor.'));
+        });
+</script>
 
 </body>
 </html>
