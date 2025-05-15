@@ -1,18 +1,20 @@
-let acaoAposFechar = null; // Variável global temporária
+let proximaAcao = null;
 
 function mostrarAlerta(mensagem, aoConfirmar = null) {
     document.getElementById("mensagemAlerta").textContent = mensagem;
     document.getElementById("alertaPersonalizado").style.display = "block";
-    acaoAposFechar = aoConfirmar;
+    document.getElementById("fundoBloqueador").style.display = "block";
+    document.body.style.overflow = "hidden"; // desativa o scroll
+    proximaAcao = aoConfirmar;
 }
 
 function fecharAlerta() {
     document.getElementById("alertaPersonalizado").style.display = "none";
-
-    // Executa ação armazenada, se houver
-    if (acaoAposFechar && typeof acaoAposFechar === "function") {
-        acaoAposFechar();
-        acaoAposFechar = null; // Limpa após executar
+    document.getElementById("fundoBloqueador").style.display = "none";
+    document.body.style.overflow = "auto"; // reativa o scroll
+    if (typeof proximaAcao === "function") {
+        proximaAcao();
+        proximaAcao = null;
     }
 }
 
@@ -53,3 +55,16 @@ function validarCodigo() {
         mostrarAlerta("Erro na solicitação. Tente novamente.");
     });
 }
+
+document.addEventListener("keydown", function(e) {
+    const alerta = document.getElementById("alertaPersonalizado");
+    const aberto = alerta && alerta.style.display === "block";
+
+    if (aberto) {
+        // Permitir apenas a tecla Enter (opcional)
+        if (e.key !== "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+}, true);

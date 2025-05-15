@@ -18,20 +18,23 @@ function atualizarMenuUsuario(status) {
 }
 
 // Variável global para armazenar ação pós-alerta
-let acaoAposFechar = null;
+let proximaAcao = null;
 
 function mostrarAlerta(mensagem, aoConfirmar = null) {
     document.getElementById("mensagemAlerta").textContent = mensagem;
     document.getElementById("alertaPersonalizado").style.display = "block";
-    acaoAposFechar = aoConfirmar;
+    document.getElementById("fundoBloqueador").style.display = "block";
+    document.body.style.overflow = "hidden"; // desativa o scroll
+    proximaAcao = aoConfirmar;
 }
 
 function fecharAlerta() {
     document.getElementById("alertaPersonalizado").style.display = "none";
-    
-    if (acaoAposFechar && typeof acaoAposFechar === 'function') {
-        acaoAposFechar();
-        acaoAposFechar = null; // Limpa a referência
+    document.getElementById("fundoBloqueador").style.display = "none";
+    document.body.style.overflow = "auto"; // reativa o scroll
+    if (typeof proximaAcao === "function") {
+        proximaAcao();
+        proximaAcao = null;
     }
 }
 
@@ -57,3 +60,17 @@ verificarSessao();
 
 // Verifica a cada 5 segundos
 setInterval(verificarSessao, 5000);
+
+
+document.addEventListener("keydown", function(e) {
+    const alerta = document.getElementById("alertaPersonalizado");
+    const aberto = alerta && alerta.style.display === "block";
+
+    if (aberto) {
+        // Permitir apenas a tecla Enter (opcional)
+        if (e.key !== "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+}, true);
