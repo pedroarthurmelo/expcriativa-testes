@@ -1,3 +1,26 @@
+-- para criar um novo usuário
+CREATE USER 'usuario123'@'localhost' IDENTIFIED BY 'senha123';
+
+-- para colocar as permissões no usuário
+GRANT SELECT, INSERT, UPDATE, DELETE ON criticajogos.* TO 'usuario123'@'localhost';
+
+-- atualizar permissoes
+FLUSH PRIVILEGES;
+
+-- para ver os usuarios existentes
+SELECT User, Host FROM mysql.user;
+
+-- para apagar um usuario
+DROP USER 'usuario123'@'localhost';
+
+-- ver as regras dele
+SHOW GRANTS FOR 'usuario123'@'localhost';
+
+-- para ver o usuário cadastrado neste exato momento
+SELECT USER(), CURRENT_USER();
+
+
+-- criar o banco de dados
 DROP DATABASE IF EXISTS criticajogos;
 CREATE DATABASE criticajogos;
 USE criticajogos;
@@ -35,6 +58,7 @@ CREATE TABLE criticas (
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
 );
+
 
 
 
