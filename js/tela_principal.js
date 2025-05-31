@@ -86,20 +86,26 @@ async function carregarJogos() {
         const melhorAvaliadosContainer = document.querySelectorAll('.row-posters')[3];
 
         jogos.forEach(jogo => {
+        const criarImagem = () => {
             const img = document.createElement('img');
             img.src = `../imagens_jogos/${jogo.imagem}`;
             img.alt = "Imagem do jogo";
-            img.classList.add('row-poster'); // <-- usa a classe correta do CSS
+            img.classList.add('row-poster');
+            img.addEventListener('click', () => {
+                window.location.href = `pagina_jogo.html?id=${jogo.id}`;
+            });
+            return img;
+        };
 
-            // Adiciona aos containers
-            lancamentosContainer.appendChild(img.cloneNode(true));
-            popularContainer.appendChild(img.cloneNode(true));
-            vendidosContainer.appendChild(img.cloneNode(true));
+        lancamentosContainer.appendChild(criarImagem());
+        popularContainer.appendChild(criarImagem());
+        vendidosContainer.appendChild(criarImagem());
 
-            if (parseFloat(jogo.avaliacao) >= 8.0) {
-                melhorAvaliadosContainer.appendChild(img.cloneNode(true));
-            }
-        });
+        if (parseFloat(jogo.avaliacao) >= 8.0) {
+            melhorAvaliadosContainer.appendChild(criarImagem());
+        }
+    });
+
 
     } catch (error) {
         console.error("Erro ao carregar jogos:", error);
