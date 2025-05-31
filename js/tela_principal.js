@@ -1,4 +1,4 @@
-// Scroll efeito no menu (mantido aqui)
+// Efeito de scroll no menu
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
     if (window.scrollY >= 100) {
@@ -8,6 +8,7 @@ window.addEventListener('scroll', () => {
     }
 });
 
+// Atualiza a exibição do menu conforme status do usuário
 function atualizarMenuUsuario(status) {
     const dropdown = document.querySelector('.dropdown');
     if (status === 'logado') {
@@ -17,9 +18,10 @@ function atualizarMenuUsuario(status) {
     }
 }
 
-// Variável global para armazenar ação pós-alerta
+// Variável global para armazenar ação após alerta
 let proximaAcao = null;
 
+// Mostra alerta com bloqueio de fundo
 function mostrarAlerta(mensagem, aoConfirmar = null) {
     document.getElementById("mensagemAlerta").textContent = mensagem;
     document.getElementById("alertaPersonalizado").style.display = "block";
@@ -28,6 +30,7 @@ function mostrarAlerta(mensagem, aoConfirmar = null) {
     proximaAcao = aoConfirmar;
 }
 
+// Fecha o alerta e executa ação (se houver)
 function fecharAlerta() {
     document.getElementById("alertaPersonalizado").style.display = "none";
     document.getElementById("fundoBloqueador").style.display = "none";
@@ -38,6 +41,7 @@ function fecharAlerta() {
     }
 }
 
+// Verifica se a sessão do usuário ainda está ativa
 function verificarSessao() {
     fetch('../php/verificar_sessao.php')
         .then(response => response.json())
@@ -55,22 +59,53 @@ function verificarSessao() {
         });
 }
 
-// Executa a verificação inicial
+// Executa a verificação inicial e define intervalo de verificação
 verificarSessao();
-
-// Verifica a cada 5 segundos
 setInterval(verificarSessao, 5000);
 
-
+// Previne teclas fora o Enter durante alerta
 document.addEventListener("keydown", function(e) {
     const alerta = document.getElementById("alertaPersonalizado");
     const aberto = alerta && alerta.style.display === "block";
 
-    if (aberto) {
-        // Permitir apenas a tecla Enter (opcional)
-        if (e.key !== "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+    if (aberto && e.key !== "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
     }
 }, true);
+
+// Carrega jogos dinamicamente nas seções
+async function carregarJogos() {
+    try {
+        const response = await fetch('../php/listar_jogos.php');
+        const jogos = await response.json();
+
+        const lancamentosContainer = document.querySelectorAll('.row-posters')[0];
+        const popularContainer = document.querySelectorAll('.row-posters')[1];
+        const vendidosContainer = document.querySelectorAll('.row-posters')[2];
+        const melhorAvaliadosContainer = document.querySelectorAll('.row-posters')[3];
+
+        jogos.forEach(jogo => {
+            const img = document.createElement('img');
+            img.src = `../imagens_jogos/${jogo.imagem}`;
+            img.alt = "Imagem do jogo";
+            img.classList.add('row-poster'); // <-- usa a classe correta do CSS
+
+            // Adiciona aos containers
+            lancamentosContainer.appendChild(img.cloneNode(true));
+            popularContainer.appendChild(img.cloneNode(true));
+            vendidosContainer.appendChild(img.cloneNode(true));
+
+            if (parseFloat(jogo.avaliacao) >= 8.0) {
+                melhorAvaliadosContainer.appendChild(img.cloneNode(true));
+            }
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar jogos:", error);
+    }
+}
+
+
+// Chamar quando a página carregar
+carregarJogos();
