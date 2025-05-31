@@ -1,61 +1,57 @@
-let proximaAcao = null;
+// Conteúdo para ../js/verificar_sessao.js
 
-function mostrarAlerta(mensagem, aoConfirmar = null) {
-    document.getElementById("mensagemAlerta").textContent = mensagem;
-    document.getElementById("alertaPersonalizado").style.display = "block";
-    document.getElementById("fundoBloqueador").style.display = "block";
-    document.body.style.overflow = "hidden"; // desativa o scroll
-    proximaAcao = aoConfirmar;
-}
-
-function fecharAlerta() {
-    document.getElementById("alertaPersonalizado").style.display = "none";
-    document.getElementById("fundoBloqueador").style.display = "none";
-    document.body.style.overflow = "auto"; // reativa o scroll
-    if (typeof proximaAcao === "function") {
-        proximaAcao();
-        proximaAcao = null;
-    }
-}
-
-function verificarSessao() {
-    fetch('../php/verificar_sessao.php')
-        .then(response => response.json())
+/**
+ * Verifica a sessão do usuário.
+ * @param {boolean} isInitialCheck - True se for a primeira verificação ao carregar a página.
+ */
+function verificarSessao(isInitialCheck = false) {
+    fetch('../php/verificar_sessao.php', { cache: 'no-store' }) // Evitar cache
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Falha na rede ou erro no servidor: ' + response.statusText);
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.status === 'expirado') {
-                mostrarAlerta('Tempo de sessão expirado! Faça login novamente.', () => {
-                    window.location.href = '../html/login.html';
-                });
+            if (data.status === 'expirado' || data.status === 'nao_logado_redirect') {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    window.location.href = '../html/login.html?reason=fallback_redirect';
+                }
             } else if (data.status === 'logado') {
-                console.log('Usuário logado:', data.user_id);
-            } else if (data.status === 'nao_logado') {
-                mostrarAlerta('Você precisa estar logado para acessar esta página.', () => {
-                    window.location.href = '../html/bem_vindo.html';
-                });
+                if (isInitialCheck) {
+                    console.log('Sessão verificada e válida. Usuário:', data.user_id);
+                    // Lógica adicional após login confirmado pode vir aqui (ex: carregar dados da página)
+                }
+            } else {
+                console.warn('Status de sessão desconhecido:', data.status);
+                if (isInitialCheck) {
+                    window.location.href = '../html/login.html?reason=unknown_status';
+                }
             }
         })
         .catch(error => {
-            console.error('Erro ao verificar a sessão:', error);
+            console.error('Erro crítico ao verificar a sessão:', error);
+            if (isInitialCheck) {
+                window.location.href = '../html/login.html?reason=session_check_failed';
+            }
         });
 }
 
+// --- Execução do Script de Verificação de Sessão ---
 
-// Verifica a sessão a cada 5 segundos
-setInterval(verificarSessao, 5000);
+// 1. VERIFICAÇÃO INICIAL:
+verificarSessao(true);
 
-// Verifica imediatamente ao carregar
-verificarSessao();
+// 2. VERIFICAÇÕES PERIÓDICAS:
+// Intervalo de 5 minutos (300.000 ms). Ajuste conforme sua necessidade.
+// Seu código original usava 5000ms (5 segundos), o que é bastante frequente.
+const TEMPO_VERIFICACAO_PERIODICA = 1000;
+setInterval(() => {
+    verificarSessao(false);
+}, TEMPO_VERIFICACAO_PERIODICA);
 
-
-document.addEventListener("keydown", function(e) {
-    const alerta = document.getElementById("alertaPersonalizado");
-    const aberto = alerta && alerta.style.display === "block";
-
-    if (aberto) {
-        // Permitir apenas a tecla Enter (opcional)
-        if (e.key !== "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }
-}, true);
+// As funções mostrarAlerta e fecharAlerta não são chamadas diretamente neste script
+// para os casos de 'expirado' ou 'nao_logado_redirect', pois o alerta será na página de login.
+// Se você precisar delas para outros fins neste arquivo, garanta que estejam definidas ou importadas.
