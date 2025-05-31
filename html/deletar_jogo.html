@@ -6,17 +6,36 @@
     <link rel="stylesheet" href="../css/deletar_jogo.css">
 </head>
 <body>
+
+    <div class="nav" id="nav">
+        <a href="../html/tela_principal.html" class="nav-logo-text">GameWorld</a>
+
+        <div class="dropdown">
+            <span class="nav-user" onclick="toggleDropdown()">Menu</span>
+            <div class="dropdown-content">
+                <a href="pagina_perfil.html">Meu Perfil</a>
+                <a href="../html/adicionar_jogo.html">Adicionar Jogo</a>
+                <a href="../html/deletar_jogo.html">Deletar Jogo</a>
+                <a href="../html/minha_lista.html">Minha Lista</a>
+                <a href="../html/logout.html">Logout</a>
+            </div>
+        </div>
+    </div>
+
+
     <h1>Deletar Jogo Cadastrado</h1>
-    <div>
-        <label for="jogoSelect">Selecione um jogo:</label>
+
+    <div class="delete-container">  <label for="jogoSelect">Selecione um jogo:</label>
         <select id="jogoSelect">
             <option value="">Carregando...</option>
-        </select>
+            </select>
         <button onclick="deletarJogo()">Deletar</button>
     </div>
 
     <div id="mensagem"></div>
 
     <script src="../js/deletar_jogo.js"></script>
+    <script src="../js/verificar_sessao.js"></script>
+    <script src="../js/botao_menu.js"></script>
 </body>
 </html>

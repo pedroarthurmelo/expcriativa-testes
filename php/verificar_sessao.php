@@ -5,7 +5,7 @@ header("Content-Type: application/json");
 // Tempo de sessão em segundos (ex: 20 minutos = 1200, 1 hora = 3600)
 // O seu valor original é 12000000, o que é muito longo (aprox. 138 dias).
 // Ajuste conforme necessário. Vou manter seu valor original por enquanto.
-$tempoMaximo = 10;
+$tempoMaximo = 1000000000;
 
 if (isset($_SESSION['user_id'])) {
     if (!isset($_SESSION['momento_login'])) {
