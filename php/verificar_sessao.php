@@ -2,7 +2,7 @@
 session_start();
 header("Content-Type: application/json");
 
-$tempoMaximo = 10000; // segundos após o login
+$tempoMaximo = 12000000; // segundos após o login
 
 if (isset($_SESSION['user_id'])) {
     if (!isset($_SESSION['momento_login'])) {
