@@ -208,7 +208,8 @@ img {
 
 .row-poster {
     height: 250px;
-    object-fit: contain;
+    width: 166.66px;
+    object-fit: cover;
     transition: transform 450ms;
     cursor: pointer;
 }
@@ -232,6 +233,7 @@ img {
 
 .row-posterLarge {
     height: 250px;
+    width: 166.66px;
 }
 
 .row-posterLarge:hover {
