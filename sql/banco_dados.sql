@@ -88,7 +88,6 @@ CREATE TABLE criticas (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (id_jogo) REFERENCES jogos(id) ON DELETE CASCADE
 );
-
 -- Tabela para "Minha Lista" (jogos favoritados)
 CREATE TABLE jogos_favoritos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -96,7 +95,8 @@ CREATE TABLE jogos_favoritos (
     id_jogo INT,
     data_adicao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_jogo) REFERENCES jogos(id) ON DELETE CASCADE
+    FOREIGN KEY (id_jogo) REFERENCES jogos(id) ON DELETE CASCADE,
+    UNIQUE KEY `unicos_favoritos` (`id_usuario`, `id_jogo`)
 );
 
 
