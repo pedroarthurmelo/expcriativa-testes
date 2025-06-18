@@ -139,7 +139,7 @@ if (mysqli_stmt_execute($stmt)) {
         $mail->isHTML(true); // Define o formato do e-mail como HTML
         $mail->Subject = "Verifique seu E-mail para ativar sua conta"; // Assunto do e-mail
         // Monta o link de verificação, incluindo o e-mail e o token de ativação
-        $verificationLink = "http://localhost/expcriativa-testes/html/confirmar_email.html?email=" . urlencode($email). "&token=$token_ativacao";
+        $verificationLink = "http://localhost/jogos/html/confirmar_email.html?email=" . urlencode($email). "&token=$token_ativacao";
 
         // Corpo do e-mail em HTML
         $htmlContent = "
