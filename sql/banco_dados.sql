@@ -14,7 +14,7 @@ SELECT User, Host FROM mysql.user;
 DROP USER 'usuario123'@'localhost';
 
 -- ver as regras dele
-SHOW GRANTS FOR 'usuario123'@'localhost';
+SHOW GRANTS FOR 'douglaspedro'@'localhost';
 
 -- para ver o usuário cadastrado neste exato momento
 SELECT USER(), CURRENT_USER();

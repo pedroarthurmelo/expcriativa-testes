@@ -1,0 +1,3 @@
+<FilesMatch "(\.env|private\.pem|public\.pem)$">
+    Require all denied
+</FilesMatch>

@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Adicionar Novo Jogo</title>
   <link rel="stylesheet" href="../css/adicionar_jogo.css">
+  <script src="https://cdn.jsdelivr.net/npm/jsencrypt@3.0.0-rc.1/bin/jsencrypt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
 
@@ -22,7 +24,6 @@
     </div>
 
   <form id="formJogo" enctype="multipart/form-data">
-    <!-- Dados principais -->
     <h3>Adicionar Novo Jogo</h3>
     <input type="text" name="nome" placeholder="Nome do jogo" required /><br />
     <textarea name="sinopse" placeholder="Sinopse"></textarea><br />

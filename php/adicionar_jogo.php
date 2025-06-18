@@ -7,32 +7,147 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require_once 'conexao.php';
+require_once 'conexao.php'; 
 
-// Dados do jogo
-$nome = $_POST['nome'] ?? '';
-$sinopse = $_POST['sinopse'] ?? '';
-$criadora = $_POST['criadora'] ?? '';
-$generos = $_POST['generos'] ?? '';
-$plataformas = $_POST['plataformas'] ?? '';
-$avaliacao = $_POST['avaliacao'] ?? null;
-$data_lancamento = $_POST['data_lancamento'] ?? null;
+// --- START DECRYPTION SECTION ---
 
-if (empty(trim($nome)) || empty(trim($criadora))) {
-    echo json_encode(["sucesso" => false, "mensagem" => "Preencha os campos obrigatórios."]);
+// 1. Load the private key from the server
+$privateKey = file_get_contents('private.pem'); // Make sure this path is correct
+if (!$privateKey) {
+    http_response_code(500);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Falha ao carregar a chave privada do servidor.']);
     exit;
 }
 
-// Upload da imagem
+// 2. Receive the encrypted data and encrypted session key from POST
+$encryptedData = $_POST['dados'] ?? '';
+$encryptedKey = $_POST['chave'] ?? '';
+
+if (empty($encryptedData) || empty($encryptedKey)) {
+    http_response_code(400);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Dados criptografados incompletos.']);
+    exit;
+}
+
+// 3. Decrypt the AES key and IV using the RSA private key
+$decryptedKeyJson = '';
+if (!openssl_private_decrypt(base64_decode($encryptedKey), $decryptedKeyJson, $privateKey)) {
+    http_response_code(500);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Falha ao descriptografar a chave de sessão.']);
+    exit;
+}
+
+$keyData = json_decode($decryptedKeyJson, true);
+if (!$keyData || !isset($keyData['chave']) || !isset($keyData['iv'])) {
+    http_response_code(500);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Pacote da chave de sessão inválido.']);
+    exit;
+}
+
+$aesKey = hex2bin($keyData['chave']);
+$iv = hex2bin($keyData['iv']);
+
+// 4. Decrypt the user data using the obtained AES key and IV
+$decryptedJson = openssl_decrypt(
+    base64_decode($encryptedData),
+    'aes-128-cbc',
+    $aesKey,
+    OPENSSL_RAW_DATA,
+    $iv
+);
+
+if ($decryptedJson === false) {
+    http_response_code(500);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Falha na descriptografia dos dados do jogo.']);
+    exit;
+}
+
+// 5. Decode the game data from JSON to a PHP array
+$gameData = json_decode($decryptedJson, true);
+if ($gameData === null) {
+    http_response_code(500);
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Os dados do jogo descriptografados não são um JSON válido.']);
+    exit;
+}
+
+// Extract data from the decrypted $gameData array
+$nome = $gameData['nome'] ?? '';
+$sinopse = $gameData['sinopse'] ?? '';
+$criadora = $gameData['criadora'] ?? '';
+$generos = $gameData['generos'] ?? '';
+$plataformas = $gameData['plataformas'] ?? '';
+$avaliacao = $gameData['avaliacao'] ?? null;
+$data_lancamento = $gameData['data_lancamento'] ?? null;
+
+// Requisitos Mínimos
+$min_so = $gameData['min_so'] ?? '';
+$min_processador = $gameData['min_processador'] ?? '';
+$min_memoria = $gameData['min_memoria'] ?? '';
+$min_placa_video = $gameData['min_placa_video'] ?? '';
+$min_armazenamento = $gameData['min_armazenamento'] ?? '';
+
+// Requisitos Recomendados
+$rec_so = $gameData['rec_so'] ?? '';
+$rec_processador = $gameData['rec_processador'] ?? '';
+$rec_memoria = $gameData['rec_memoria'] ?? '';
+$rec_placa_video = $gameData['rec_placa_video'] ?? '';
+$rec_armazenamento = $gameData['rec_armazenamento'] ?? '';
+
+// --- END DECRYPTION SECTION ---
+
+
+// Array de campos obrigatórios (using the decrypted data)
+$required_fields = [
+    'nome' => $nome,
+    'sinopse' => $sinopse,
+    'criadora' => $criadora,
+    'generos' => $generos,
+    'plataformas' => $plataformas,
+    'min_so' => $min_so,
+    'min_processador' => $min_processador,
+    'min_memoria' => $min_memoria,
+    'min_placa_video' => $min_placa_video,
+    'min_armazenamento' => $min_armazenamento,
+    'rec_so' => $rec_so,
+    'rec_processador' => $rec_processador,
+    'rec_memoria' => $rec_memoria,
+    'rec_placa_video' => $rec_placa_video,
+    'rec_armazenamento' => $rec_armazenamento
+];
+
+// Validação de campos de texto
+foreach ($required_fields as $field_name => $field_value) {
+    if (empty(trim($field_value))) {
+        echo json_encode(["sucesso" => false, "mensagem" => "Por favor, preencha todos os campos. O campo '" . $field_name . "' está vazio."]);
+        exit;
+    }
+}
+
+// Validação específica para 'avaliacao' (pode ser null, mas se fornecido deve ser numérico)
+if (!is_null($avaliacao) && !is_numeric($avaliacao)) {
+    echo json_encode(["sucesso" => false, "mensagem" => "A avaliação deve ser um número válido."]);
+    exit;
+}
+
+// Validação específica para 'data_lancamento' (pode ser null, mas se fornecido deve ser uma data válida)
+if (!empty($data_lancamento) && !strtotime($data_lancamento)) {
+    echo json_encode(["sucesso" => false, "mensagem" => "A data de lançamento não é válida."]);
+    exit;
+}
+
+// --- Validação e Upload da Imagem (AGORA OBRIGATÓRIA) ---
 $imagem_nome = null;
-if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
+if (!isset($_FILES['imagem']) || $_FILES['imagem']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(["sucesso" => false, "mensagem" => "Por favor, selecione uma imagem para o jogo."]);
+    exit;
+} else {
     $arquivo_tmp = $_FILES['imagem']['tmp_name'];
     $nome_arquivo = basename($_FILES['imagem']['name']);
     $extensao = strtolower(pathinfo($nome_arquivo, PATHINFO_EXTENSION));
     $extensoes_permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
     if (!in_array($extensao, $extensoes_permitidas)) {
-        echo json_encode(["sucesso" => false, "mensagem" => "Tipo de arquivo não permitido."]);
+        echo json_encode(["sucesso" => false, "mensagem" => "Tipo de arquivo de imagem não permitido. Apenas JPG, JPEG, PNG, GIF e WEBP são aceitos."]);
         exit;
     }
 
@@ -47,12 +162,14 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
 
     $imagem_nome = $novo_nome;
 }
+// --- Fim da Validação e Upload da Imagem ---
+
 
 // Inserir jogo
 $stmt = $con->prepare("INSERT INTO jogos (nome, sinopse, criadora, generos, plataformas, avaliacao, data_lancamento, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
 if (!$stmt) {
-    echo json_encode(["sucesso" => false, "mensagem" => "Erro na preparação da query: " . $con->error]);
+    echo json_encode(["sucesso" => false, "mensagem" => "Erro na preparação da query para jogos: " . $con->error]);
     exit;
 }
 
@@ -74,20 +191,6 @@ $stmt->bind_param(
 if ($stmt->execute()) {
     $id_jogo = $con->insert_id;
 
-    // Coleta de requisitos mínimos
-    $min_so = $_POST['min_so'] ?? '';
-    $min_processador = $_POST['min_processador'] ?? '';
-    $min_memoria = $_POST['min_memoria'] ?? '';
-    $min_placa_video = $_POST['min_placa_video'] ?? '';
-    $min_armazenamento = $_POST['min_armazenamento'] ?? '';
-
-    // Coleta de requisitos recomendados
-    $rec_so = $_POST['rec_so'] ?? '';
-    $rec_processador = $_POST['rec_processador'] ?? '';
-    $rec_memoria = $_POST['rec_memoria'] ?? '';
-    $rec_placa_video = $_POST['rec_placa_video'] ?? '';
-    $rec_armazenamento = $_POST['rec_armazenamento'] ?? '';
-
     // Inserção dos requisitos
     $stmt_requisitos = $con->prepare("INSERT INTO requisitos_sistema (id_jogo, tipo, so, processador, memoria, placa_video, armazenamento) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
@@ -95,14 +198,20 @@ if ($stmt->execute()) {
         // Inserir mínimos
         $tipo = 'minimos';
         $stmt_requisitos->bind_param("issssss", $id_jogo, $tipo, $min_so, $min_processador, $min_memoria, $min_placa_video, $min_armazenamento);
-        $stmt_requisitos->execute();
+        if (!$stmt_requisitos->execute()) {
+            error_log("Erro ao inserir requisitos mínimos para o jogo ID {$id_jogo}: " . $stmt_requisitos->error);
+        }
 
         // Inserir recomendados
         $tipo = 'recomendados';
         $stmt_requisitos->bind_param("issssss", $id_jogo, $tipo, $rec_so, $rec_processador, $rec_memoria, $rec_placa_video, $rec_armazenamento);
-        $stmt_requisitos->execute();
+        if (!$stmt_requisitos->execute()) {
+            error_log("Erro ao inserir requisitos recomendados para o jogo ID {$id_jogo}: " . $stmt_requisitos->error);
+        }
 
         $stmt_requisitos->close();
+    } else {
+        error_log("Erro na preparação da query para requisitos: " . $con->error);
     }
 
     echo json_encode(["sucesso" => true, "mensagem" => "Jogo e requisitos adicionados com sucesso!"]);
@@ -112,3 +221,4 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $con->close();
+?>

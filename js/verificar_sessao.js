@@ -39,19 +39,13 @@ function verificarSessao(isInitialCheck = false) {
         });
 }
 
-// --- Execução do Script de Verificação de Sessão ---
 
 // 1. VERIFICAÇÃO INICIAL:
 verificarSessao(true);
 
-// 2. VERIFICAÇÕES PERIÓDICAS:
-// Intervalo de 5 minutos (300.000 ms). Ajuste conforme sua necessidade.
-// Seu código original usava 5000ms (5 segundos), o que é bastante frequente.
+
 const TEMPO_VERIFICACAO_PERIODICA = 1000;
 setInterval(() => {
     verificarSessao(false);
 }, TEMPO_VERIFICACAO_PERIODICA);
 
-// As funções mostrarAlerta e fecharAlerta não são chamadas diretamente neste script
-// para os casos de 'expirado' ou 'nao_logado_redirect', pois o alerta será na página de login.
-// Se você precisar delas para outros fins neste arquivo, garanta que estejam definidas ou importadas.

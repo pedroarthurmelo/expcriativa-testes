@@ -1,4 +1,19 @@
 let proximaAcao = null; // Variável global temporária
+let encryptor; // Declare encryptor globally
+
+// Fetch public key on page load
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('../php/get_public_key.php') // Assuming get_public_key.php is accessible at the root or adjust path
+        .then(response => response.text())
+        .then(publicKey => {
+            encryptor = new JSEncrypt();
+            encryptor.setPublicKey(publicKey);
+        })
+        .catch(error => {
+            console.error("Error fetching public key:", error);
+            mostrarAlerta("Erro ao carregar chave de segurança. Tente novamente.");
+        });
+});
 
 function mostrarAlerta(mensagem, aoConfirmar = null) {
     document.getElementById("mensagemAlerta").textContent = mensagem;
@@ -18,7 +33,7 @@ function fecharAlerta() {
     }
 }
 
-function login() {
+async function login() { // Made function async
     let email = document.getElementById("email").value;
     let senha = document.getElementById("senha").value;
 
@@ -27,20 +42,57 @@ function login() {
         return;
     }
 
-    // Certifique-se que a biblioteca CryptoJS.SHA256 está carregada na sua página login.html
-    // Ex: <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    let hashedPassword = CryptoJS.SHA256(senha).toString();
+    if (!encryptor) {
+        mostrarAlerta("Chave de segurança não carregada. Aguarde ou recarregue a página.");
+        return;
+    }
+
+    // Generate random AES key and IV
+    const aesKey = CryptoJS.lib.WordArray.random(16);
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    // Hash the password with SHA256
+    const hashedPassword = CryptoJS.SHA256(senha).toString();
+
+    // Prepare data to be encrypted (email and hashed password)
+    const loginData = JSON.stringify({
+        email: email,
+        password: hashedPassword
+    });
+
+    // Encrypt the combined login data with AES
+    const encryptedLoginData = CryptoJS.AES.encrypt(loginData, aesKey, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    }).toString();
+
+    // Package AES key and IV as JSON
+    const keyPackage = JSON.stringify({
+        key: aesKey.toString(CryptoJS.enc.Hex),
+        iv: iv.toString(CryptoJS.enc.Hex)
+    });
+
+    // Encrypt the AES key package with RSA
+    const encryptedKey = encryptor.encrypt(keyPackage);
+
+    if (!encryptedKey) {
+        mostrarAlerta("Erro na criptografia da chave de sessão. Tente novamente.");
+        return;
+    }
 
     let formData = new FormData();
-    formData.append("email", email);
-    formData.append("senha", hashedPassword);
+    formData.append("encryptedLoginData", encryptedLoginData); // Send encrypted email and password
+    formData.append("encryptedKey", encryptedKey); // Send encrypted AES key + IV
 
-    fetch("../php/login.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const response = await fetch("../php/login.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
         if (data.status === "success") {
             mostrarAlerta(data.message, () => {
                 window.location.href = "dashboard.html"; // Ajuste o caminho se necessário
@@ -58,11 +110,10 @@ function login() {
         } else {
             mostrarAlerta(data.message || "Erro no login. Tente novamente.");
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error("Erro:", error);
         mostrarAlerta("Erro no login. Tente novamente.");
-    });
+    }
 }
 
 // Listener para o pressionamento de teclas quando o alerta estiver aberto
@@ -71,14 +122,10 @@ document.addEventListener("keydown", function(e) {
     const aberto = alerta && alerta.style.display === "block";
 
     if (aberto) {
-        // Permite que a tecla Enter funcione para o botão de fechar (se ele estiver focado)
-        // e previne outras teclas de interagirem com o fundo.
         if (e.key !== "Enter") {
             e.preventDefault();
             e.stopPropagation();
         }
-        // Se você tiver um botão "OK" ou "Fechar" no alerta que chama fecharAlerta()
-        // e ele estiver focado, Enter o ativará.
     }
 }, true);
 
@@ -98,11 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (reason === 'fallback_redirect' || reason === 'unknown_status') {
         alertMessage = 'Ocorreu um redirecionamento inesperado. Por favor, faça login.';
     }
-    // Adicione outros 'else if' para mais 'reasons' conforme necessário.
 
     if (alertMessage) {
         mostrarAlerta(alertMessage);
-        // Opcional: Limpar o parâmetro da URL
         if (window.history.replaceState) {
             const cleanURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
             window.history.replaceState({ path: cleanURL }, '', cleanURL);
