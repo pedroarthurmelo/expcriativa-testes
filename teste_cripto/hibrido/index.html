@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Criptografia Híbrida</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.0/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/aes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/mode-cbc.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/pad-pkcs7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/enc-base64.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/enc-hex.min.js"></script>
+
+</head>
+<body>
+    <h1>Criptografia Híbrida (JS para PHP)</h1>
+
+    <label for="messageInput">Mensagem a ser Criptografada:</label><br>
+    <textarea id="messageInput" rows="5" cols="50"></textarea><br><br>
+    <button onclick="sendEncryptedData()">Criptografar e Enviar Hibridamente</button><br><br>
+
+    <p>Resposta do Servidor:</p>
+    <div id="serverResponse">Aguardando...</div>
+
+    <script src="hibrido.js">
+        document.addEventListener('DOMContentLoaded', fetchPublicKey);
+    </script>
+</body>
+</html>
